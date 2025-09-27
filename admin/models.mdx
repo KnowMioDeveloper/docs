@@ -1,0 +1,49 @@
+---
+title: Models
+description: Configure AI models for your applications
+---
+
+Manage the AI models available to your organization, including embedding models and language models from multiple providers.
+
+## Model Settings
+
+Configure which models are available for use across your organization.
+
+### Embedding Model
+
+Select your embedding model for all embedding operations in your organization. Only one embedding model can be active at a time.
+
+The default embedding model is **Text Embedding 3 Large** from OpenAI.
+
+### Language Models
+
+Enable the language models you want to make available to your organization. You can select from models across multiple providers including:
+
+- **OpenAI** 
+- **Anthropic** 
+- **Google** 
+- **AWS Bedrock** 
+
+## Model Overview
+
+The models table displays all configured models with the following information:
+
+- **Name** - The display name and model identifier
+- **Provider** - The model provider (OpenAI, Google, Anthropic, Bedrock)
+- **Type** - Either "language" or "embedding"
+- **Pricing** - Input and output pricing per million tokens
+- **Created** - Date the model was added
+
+## Adding a New Model
+
+To add a new model to your organization, click the plus icon to configure a new model integration.
+
+## Model Types
+
+### Language Models
+
+Language models are used for text generation, chat, and completion tasks. You can enable multiple language models simultaneously.
+
+### Embedding Models
+
+Embedding models convert text into vector representations for semantic search and similarity operations. Only one embedding model can be active at a time.
