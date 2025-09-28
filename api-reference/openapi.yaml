@@ -6,9 +6,9 @@ info:
     Knowledge Management API with AI capabilities.
     
     ## Organization Context
-    Most endpoints accept an optional `organizationId` parameter. When not provided, the API uses the active organization from your session. You only need to provide `organizationId` when:
-    - Accessing resources from a different organization than your active one
-    - The endpoint explicitly requires it (marked as required)
+    The `organizationId` parameter behavior depends on your authentication method:
+    - **Session Authentication (Cookie)**: organizationId is optional and defaults to your session's active organization
+    - **API Key Authentication**: organizationId is REQUIRED for all endpoints that have this parameter
     
     ## Authentication
     Auth endpoints are managed by Better Auth. See full auth documentation at `/api/auth/reference`
@@ -79,7 +79,7 @@ paths:
             type: string
         - name: organizationId
           in: query
-          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
+          description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
           required: false
           schema:
             type: string
@@ -109,7 +109,7 @@ paths:
       parameters:
         - name: organizationId
           in: query
-          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
+          description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
           required: false
           schema:
             type: string
@@ -152,7 +152,7 @@ paths:
             type: string
         - name: organizationId
           in: query
-          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
+          description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
           required: false
           schema:
             type: string
@@ -230,12 +230,6 @@ paths:
           in: query
           description: Specific message ID to retrieve
           required: false
-          schema:
-            type: string
-        - name: organizationId
-          in: query
-          description: Organization ID - Required for this operation
-          required: true
           schema:
             type: string
       responses:
@@ -542,7 +536,7 @@ paths:
             type: string
         - name: organizationId
           in: query
-          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
+          description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
           required: false
           schema:
             type: string
@@ -574,7 +568,7 @@ paths:
       parameters:
         - name: organizationId
           in: query
-          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
+          description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
           required: false
           schema:
             type: string
@@ -624,7 +618,7 @@ paths:
             type: string
         - name: organizationId
           in: query
-          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
+          description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
           required: false
           schema:
             type: string
@@ -673,7 +667,7 @@ paths:
             type: string
         - name: organizationId
           in: query
-          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
+          description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
           required: false
           schema:
             type: string
@@ -714,7 +708,7 @@ paths:
             type: string
         - name: organizationId
           in: query
-          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
+          description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
           required: false
           schema:
             type: string
@@ -861,7 +855,7 @@ paths:
             type: integer
         - name: organizationId
           in: query
-          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
+          description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
           required: false
           schema:
             type: string
@@ -889,7 +883,7 @@ paths:
       parameters:
         - name: organizationId
           in: query
-          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
+          description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
           required: false
           schema:
             type: string
@@ -947,7 +941,7 @@ paths:
             type: integer
         - name: organizationId
           in: query
-          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
+          description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
           required: false
           schema:
             type: string
@@ -1000,7 +994,7 @@ paths:
             type: integer
         - name: organizationId
           in: query
-          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
+          description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
           required: false
           schema:
             type: string
