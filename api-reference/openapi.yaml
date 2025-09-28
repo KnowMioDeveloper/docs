@@ -232,6 +232,12 @@ paths:
           required: false
           schema:
             type: string
+        - name: organizationId
+          in: query
+          description: Organization ID - Required for this operation
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Successful response
