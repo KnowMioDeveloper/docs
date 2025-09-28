@@ -1,0 +1,1643 @@
+openapi: 3.0.3
+info:
+  title: KM API
+  version: 1.0.0
+  description: Knowledge Management API with AI capabilities
+  contact:
+    name: API Support
+servers:
+  - url: http://localhost:8000/api
+    description: Local development server
+  - url: https://api.example.com/api
+    description: Production server
+security:
+  - cookieAuth: []
+paths:
+  /health:
+    get:
+      tags:
+        - System
+      summary: Check system health
+      description: Returns the health status of the API and database connection
+      operationId: getHealth
+      security: []
+      responses:
+        '200':
+          description: System is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [healthy]
+                  timestamp:
+                    type: string
+                    format: date-time
+                  database:
+                    type: string
+                    enum: [connected]
+        '503':
+          description: System is unhealthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [unhealthy]
+                  timestamp:
+                    type: string
+                    format: date-time
+                  database:
+                    type: string
+                    enum: [disconnected, error]
+                  error:
+                    type: string
+  /auth/sign-in/email:
+    post:
+      tags:
+        - Auth
+      summary: Sign in with email
+      description: Authenticate with email and password
+      operationId: signInEmail
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                rememberMe:
+                  type: boolean
+                  description: Keep the session active for longer
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: Successfully authenticated
+          headers:
+            Set-Cookie:
+              description: Session cookie
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: Session token
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      email:
+                        type: string
+                      name:
+                        type: string
+                      emailVerified:
+                        type: boolean
+                      createdAt:
+                        type: string
+                        format: date-time
+                      updatedAt:
+                        type: string
+                        format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /auth/sign-up/email:
+    post:
+      tags:
+        - Auth
+      summary: Sign up with email
+      description: Create a new account with email and password
+      operationId: signUpEmail
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                name:
+                  type: string
+                image:
+                  type: string
+                  description: Profile image URL
+              required:
+                - email
+                - password
+                - name
+      responses:
+        '200':
+          description: Account created successfully
+          headers:
+            Set-Cookie:
+              description: Session cookie
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: Session token
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      email:
+                        type: string
+                      name:
+                        type: string
+                      emailVerified:
+                        type: boolean
+                      createdAt:
+                        type: string
+                        format: date-time
+                      updatedAt:
+                        type: string
+                        format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /auth/get-session:
+    get:
+      tags:
+        - Auth
+      summary: Get current session
+      description: Retrieve the current session and user details
+      operationId: getSession
+      responses:
+        '200':
+          description: Session details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session:
+                    $ref: '#/components/schemas/Session'
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /auth/sign-out:
+    post:
+      tags:
+        - Auth
+      summary: Sign out
+      description: End the current session
+      operationId: signOut
+      responses:
+        '200':
+          description: Successfully signed out
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /chat:
+    get:
+      tags:
+        - Chat
+      summary: Get chats
+      description: Retrieve a specific chat by ID or all chats for the organization
+      operationId: getChats
+      parameters:
+        - name: id
+          in: query
+          description: Specific chat ID to retrieve
+          required: false
+          schema:
+            type: string
+        - name: organizationId
+          in: query
+          description: Organization ID (defaults to session's active organization)
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Chat'
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Chat'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Chat
+      summary: Create a new chat
+      description: Create a new chat session
+      operationId: createChat
+      parameters:
+        - name: organizationId
+          in: query
+          description: Organization ID (defaults to session's active organization)
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                metadata:
+                  type: object
+              required:
+                - title
+      responses:
+        '201':
+          description: Chat created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Chat
+      summary: Update a chat
+      description: Update an existing chat
+      operationId: updateChat
+      parameters:
+        - name: id
+          in: query
+          description: Chat ID to update
+          required: true
+          schema:
+            type: string
+        - name: organizationId
+          in: query
+          description: Organization ID (defaults to session's active organization)
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                metadata:
+                  type: object
+      responses:
+        '200':
+          description: Chat updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Chat
+      summary: Delete a chat
+      description: Delete a chat and all its messages
+      operationId: deleteChat
+      parameters:
+        - name: id
+          in: query
+          description: Chat ID to delete
+          required: true
+          schema:
+            type: string
+        - name: organizationId
+          in: query
+          description: Organization ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Chat deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /messages:
+    get:
+      tags:
+        - Messages
+      summary: Get messages
+      description: Retrieve messages for a specific chat
+      operationId: getMessages
+      parameters:
+        - name: chatId
+          in: query
+          description: Chat ID to get messages for
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: query
+          description: Specific message ID to retrieve
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Message'
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Message'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /invoke/stream:
+    post:
+      tags:
+        - AI
+      summary: Stream AI completion
+      description: Stream AI responses with optional RAG (Retrieval-Augmented Generation)
+      operationId: invokeStream
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: Chat ID
+                messages:
+                  type: array
+                  description: Conversation messages
+                  items:
+                    type: object
+                model:
+                  type: string
+                  description: Model name
+                provider:
+                  type: string
+                  enum: [openai, anthropic, google, cohere, bedrock]
+                organizationId:
+                  type: string
+                  description: Organization ID (optional)
+                knowledgeIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  description: Knowledge base IDs for RAG (optional)
+              required:
+                - id
+                - messages
+                - model
+                - provider
+      responses:
+        '200':
+          description: Server-Sent Events stream
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: UI message stream events
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /openai/chat/completions:
+    post:
+      tags:
+        - AI
+      summary: OpenAI-compatible chat completion
+      description: OpenAI-compatible endpoint that uses Claude Opus 4.1 via Bedrock
+      operationId: openaiChatCompletions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                model:
+                  type: string
+                  description: Model name (ignored, always uses Claude Opus 4.1)
+                messages:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      role:
+                        type: string
+                        enum: [system, developer, user, assistant]
+                      content:
+                        type: string
+                    required:
+                      - role
+                      - content
+              required:
+                - model
+                - messages
+      responses:
+        '200':
+          description: OpenAI-compatible streaming response
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: OpenAI-format SSE stream
+  /embed/single:
+    post:
+      tags:
+        - Embeddings
+      summary: Create single embedding
+      description: Generate embedding vector for a single text
+      operationId: embedSingle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: string
+                  description: Text to embed
+                organizationId:
+                  type: string
+                  description: Organization ID (optional)
+              required:
+                - value
+      responses:
+        '200':
+          description: Embedding generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  embedding:
+                    type: array
+                    items:
+                      type: number
+                  usage:
+                    type: object
+                    properties:
+                      tokens:
+                        type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /embed/many:
+    post:
+      tags:
+        - Embeddings
+      summary: Create multiple embeddings
+      description: Generate embedding vectors for multiple texts in parallel
+      operationId: embedMany
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                values:
+                  type: array
+                  items:
+                    type: string
+                  description: Texts to embed
+                maxParallelCalls:
+                  type: integer
+                  minimum: 1
+                  maximum: 10
+                  default: 3
+                  description: Maximum parallel API calls
+                organizationId:
+                  type: string
+                  description: Organization ID (optional)
+              required:
+                - values
+      responses:
+        '200':
+          description: Embeddings generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  embeddings:
+                    type: array
+                    items:
+                      type: array
+                      items:
+                        type: number
+                  usage:
+                    type: object
+                    properties:
+                      tokens:
+                        type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /search:
+    post:
+      tags:
+        - Search
+      summary: Search knowledge bases
+      description: Hybrid semantic and keyword search across knowledge bases
+      operationId: search
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  description: Search query
+                knowledgeIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  minItems: 1
+                  description: Knowledge base IDs to search
+                organizationId:
+                  type: string
+                  description: Organization ID (optional)
+                limit:
+                  type: integer
+                  minimum: 1
+                  maximum: 100
+                  default: 10
+                  description: Maximum results to return
+              required:
+                - query
+                - knowledgeIds
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    content:
+                      type: string
+                    score:
+                      type: number
+                    metadata:
+                      type: object
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /knowledge:
+    get:
+      tags:
+        - Knowledge
+      summary: Get knowledge items
+      description: Retrieve knowledge bases
+      operationId: getKnowledge
+      parameters:
+        - name: id
+          in: query
+          description: Specific knowledge item ID
+          required: false
+          schema:
+            type: string
+        - name: organizationId
+          in: query
+          description: Organization ID (defaults to session's active organization)
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Knowledge'
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Knowledge'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Knowledge
+      summary: Create knowledge base
+      description: Create a new knowledge base
+      operationId: createKnowledge
+      parameters:
+        - name: organizationId
+          in: query
+          description: Organization ID (defaults to session's active organization)
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                type:
+                  type: string
+                metadata:
+                  type: object
+              required:
+                - name
+                - type
+      responses:
+        '201':
+          description: Knowledge base created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Knowledge'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Knowledge
+      summary: Update knowledge base
+      description: Update an existing knowledge base
+      operationId: updateKnowledge
+      parameters:
+        - name: id
+          in: query
+          description: Knowledge item ID to update
+          required: true
+          schema:
+            type: string
+        - name: organizationId
+          in: query
+          description: Organization ID (defaults to session's active organization)
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                type:
+                  type: string
+                metadata:
+                  type: object
+      responses:
+        '200':
+          description: Knowledge base updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Knowledge'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Knowledge
+      summary: Delete knowledge base
+      description: Delete a knowledge base
+      operationId: deleteKnowledge
+      parameters:
+        - name: id
+          in: query
+          description: Knowledge item ID to delete
+          required: true
+          schema:
+            type: string
+        - name: organizationId
+          in: query
+          description: Organization ID (defaults to session's active organization)
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Knowledge base deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Knowledge'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /files:
+    get:
+      tags:
+        - Files
+      summary: Get files
+      description: Retrieve files associated with knowledge bases
+      operationId: getFiles
+      parameters:
+        - name: id
+          in: query
+          description: Specific file ID
+          required: false
+          schema:
+            type: string
+        - name: knowledgeId
+          in: query
+          description: Filter by knowledge item ID
+          required: false
+          schema:
+            type: string
+        - name: organizationId
+          in: query
+          description: Organization ID (defaults to session's active organization)
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/File'
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/File'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /upload/presigned-url:
+    post:
+      tags:
+        - Upload
+      summary: Get presigned upload URL
+      description: Generate a presigned URL for uploading files to S3
+      operationId: getPresignedUrl
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                knowledgeId:
+                  type: string
+                  format: uuid
+                  description: Knowledge base ID to associate file with
+                fileName:
+                  type: string
+                  description: Original file name
+                contentType:
+                  type: string
+                  description: MIME type of the file
+                organizationId:
+                  type: string
+                  description: Organization ID (optional)
+              required:
+                - knowledgeId
+                - fileName
+                - contentType
+      responses:
+        '200':
+          description: Presigned URL generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    description: Presigned upload URL
+                  fields:
+                    type: object
+                    description: Additional form fields for upload
+                  key:
+                    type: string
+                    description: S3 object key
+                  expiresIn:
+                    type: integer
+                    description: URL expiration time in seconds
+                required:
+                  - url
+                  - fields
+                  - key
+                  - expiresIn
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /upload:
+    delete:
+      tags:
+        - Upload
+      summary: Delete uploaded file
+      description: Delete a file from S3 (database deletion handled by event trigger)
+      operationId: deleteUpload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                  description: S3 file path
+                organizationId:
+                  type: string
+                  description: Organization ID (optional)
+              required:
+                - path
+      responses:
+        '200':
+          description: File deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /config:
+    get:
+      tags:
+        - Config
+      summary: Get configuration
+      description: Retrieve organization configuration
+      operationId: getConfig
+      parameters:
+        - name: id
+          in: query
+          description: Specific config ID
+          required: false
+          schema:
+            type: integer
+        - name: organizationId
+          in: query
+          description: Organization ID (defaults to session's active organization)
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Config
+      summary: Create configuration
+      description: Create organization configuration
+      operationId: createConfig
+      parameters:
+        - name: organizationId
+          in: query
+          description: Organization ID (defaults to session's active organization)
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                languageModels:
+                  type: array
+                  items:
+                    type: string
+                embeddingModel:
+                  type: string
+                allowedMimeTypes:
+                  type: array
+                  items:
+                    type: string
+                defaultPrompt:
+                  type: string
+              required:
+                - languageModels
+                - embeddingModel
+                - allowedMimeTypes
+                - defaultPrompt
+      responses:
+        '201':
+          description: Configuration created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Config
+      summary: Update configuration
+      description: Update organization configuration
+      operationId: updateConfig
+      parameters:
+        - name: id
+          in: query
+          description: Config ID to update
+          required: true
+          schema:
+            type: integer
+        - name: organizationId
+          in: query
+          description: Organization ID (defaults to session's active organization)
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                languageModels:
+                  type: array
+                  items:
+                    type: string
+                embeddingModel:
+                  type: string
+                allowedMimeTypes:
+                  type: array
+                  items:
+                    type: string
+                defaultPrompt:
+                  type: string
+      responses:
+        '200':
+          description: Configuration updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Config
+      summary: Delete configuration
+      description: Delete organization configuration
+      operationId: deleteConfig
+      parameters:
+        - name: id
+          in: query
+          description: Config ID to delete
+          required: true
+          schema:
+            type: integer
+        - name: organizationId
+          in: query
+          description: Organization ID (defaults to session's active organization)
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Configuration deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /models:
+    get:
+      tags:
+        - Models
+      summary: Get AI models
+      description: Retrieve available AI models
+      operationId: getModels
+      parameters:
+        - name: slug
+          in: query
+          description: Specific model slug
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Model'
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Model'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Models
+      summary: Create AI model
+      description: Add a new AI model
+      operationId: createModel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                slug:
+                  type: string
+                name:
+                  type: string
+                provider:
+                  type: string
+                  enum: [openai, anthropic, google, cohere, bedrock]
+                metadata:
+                  type: object
+              required:
+                - slug
+                - name
+                - provider
+      responses:
+        '201':
+          description: Model created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Model'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Models
+      summary: Update AI model
+      description: Update an existing AI model
+      operationId: updateModel
+      parameters:
+        - name: slug
+          in: query
+          description: Model slug to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                provider:
+                  type: string
+                  enum: [openai, anthropic, google, cohere, bedrock]
+                metadata:
+                  type: object
+      responses:
+        '200':
+          description: Model updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Model'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Models
+      summary: Delete AI model
+      description: Delete an AI model
+      operationId: deleteModel
+      parameters:
+        - name: slug
+          in: query
+          description: Model slug to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Model deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Model'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: better-auth.session_token
+      description: Session cookie from Better Auth. Obtain by calling POST /api/auth/sign-in or POST /api/auth/sign-up
+  schemas:
+    Chat:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        organizationId:
+          type: string
+        title:
+          type: string
+        metadata:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - userId
+        - organizationId
+        - title
+        - createdAt
+        - updatedAt
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+        chatId:
+          type: string
+        role:
+          type: string
+        content:
+          type: string
+        metadata:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - chatId
+        - role
+        - content
+        - createdAt
+    Knowledge:
+      type: object
+      properties:
+        id:
+          type: string
+        organizationId:
+          type: string
+        createdBy:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+        metadata:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - organizationId
+        - createdBy
+        - name
+        - type
+        - createdAt
+        - updatedAt
+    File:
+      type: object
+      properties:
+        id:
+          type: string
+        knowledgeId:
+          type: string
+        name:
+          type: string
+        path:
+          type: string
+        size:
+          type: integer
+        mimeType:
+          type: string
+        metadata:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - knowledgeId
+        - name
+        - path
+        - size
+        - mimeType
+        - createdAt
+        - updatedAt
+    Config:
+      type: object
+      properties:
+        id:
+          type: integer
+        organizationId:
+          type: string
+        languageModels:
+          type: array
+          items:
+            type: string
+        embeddingModel:
+          type: string
+        allowedMimeTypes:
+          type: array
+          items:
+            type: string
+        defaultPrompt:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - organizationId
+        - languageModels
+        - embeddingModel
+        - allowedMimeTypes
+        - defaultPrompt
+        - createdAt
+        - updatedAt
+    Model:
+      type: object
+      properties:
+        slug:
+          type: string
+        name:
+          type: string
+        provider:
+          type: string
+          enum: [openai, anthropic, google, cohere, bedrock]
+        metadata:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - slug
+        - name
+        - provider
+        - createdAt
+        - updatedAt
+    Session:
+      type: object
+      properties:
+        id:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+        token:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        ipAddress:
+          type: string
+        userAgent:
+          type: string
+        userId:
+          type: string
+        activeOrganizationId:
+          type: string
+          nullable: true
+        activeTeamId:
+          type: string
+          nullable: true
+        impersonatedBy:
+          type: string
+          nullable: true
+      required:
+        - id
+        - expiresAt
+        - token
+        - createdAt
+        - updatedAt
+        - userId
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        emailVerified:
+          type: boolean
+        image:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        role:
+          type: string
+          default: user
+        banned:
+          type: boolean
+          default: false
+        banReason:
+          type: string
+          nullable: true
+        banExpires:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - id
+        - name
+        - email
+        - emailVerified
+        - createdAt
+        - updatedAt
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        details:
+          type: string
+      required:
+        - error
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    TooManyRequests:
+      description: Too many requests
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ServiceUnavailable:
+      description: Service unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+tags:
+  - name: Auth
+    description: Authentication endpoints (sign in, sign up, sign out)
+  - name: System
+    description: System health and status endpoints
+  - name: Chat
+    description: Chat management endpoints
+  - name: Messages
+    description: Chat message operations
+  - name: AI
+    description: AI completion and streaming endpoints
+  - name: Embeddings
+    description: Text embedding generation
+  - name: Search
+    description: Knowledge base search
+  - name: Knowledge
+    description: Knowledge base management
+  - name: Files
+    description: File operations for knowledge bases
+  - name: Upload
+    description: File upload operations
+  - name: Config
+    description: Organization configuration
+  - name: Models
+    description: AI model management
