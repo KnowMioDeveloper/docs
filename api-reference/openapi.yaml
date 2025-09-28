@@ -80,7 +80,7 @@ paths:
         - name: organizationId
           in: query
           description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
-          required: false
+          required: true
           schema:
             type: string
       responses:
@@ -110,7 +110,7 @@ paths:
         - name: organizationId
           in: query
           description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
-          required: false
+          required: true
           schema:
             type: string
       requestBody:
@@ -153,7 +153,7 @@ paths:
         - name: organizationId
           in: query
           description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
-          required: false
+          required: true
           schema:
             type: string
       requestBody:
@@ -232,6 +232,12 @@ paths:
           required: false
           schema:
             type: string
+        - name: organizationId
+          in: query
+          description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Successful response
@@ -279,7 +285,7 @@ paths:
                   enum: [openai, anthropic, google, cohere, bedrock]
                 organizationId:
                   type: string
-                  description: Organization ID - Optional, uses session's active organization if not provided
+                  description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
                 knowledgeIds:
                   type: array
                   items:
@@ -291,6 +297,7 @@ paths:
                 - messages
                 - model
                 - provider
+                - organizationId
       responses:
         '200':
           description: Server-Sent Events stream
@@ -367,9 +374,10 @@ paths:
                   description: Text to embed
                 organizationId:
                   type: string
-                  description: Organization ID - Optional, uses session's active organization if not provided
+                  description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
               required:
                 - value
+                - organizationId
       responses:
         '200':
           description: Embedding generated successfully
@@ -426,9 +434,10 @@ paths:
                   description: Maximum parallel API calls
                 organizationId:
                   type: string
-                  description: Organization ID - Optional, uses session's active organization if not provided
+                  description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
               required:
                 - values
+                - organizationId
       responses:
         '200':
           description: Embeddings generated successfully
@@ -486,7 +495,7 @@ paths:
                   description: Knowledge base IDs to search
                 organizationId:
                   type: string
-                  description: Organization ID - Optional, uses session's active organization if not provided
+                  description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
                 limit:
                   type: integer
                   minimum: 1
@@ -496,6 +505,7 @@ paths:
               required:
                 - query
                 - knowledgeIds
+                - organizationId
       responses:
         '200':
           description: Search results
@@ -537,7 +547,7 @@ paths:
         - name: organizationId
           in: query
           description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
-          required: false
+          required: true
           schema:
             type: string
       responses:
@@ -569,7 +579,7 @@ paths:
         - name: organizationId
           in: query
           description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
-          required: false
+          required: true
           schema:
             type: string
       requestBody:
@@ -619,7 +629,7 @@ paths:
         - name: organizationId
           in: query
           description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
-          required: false
+          required: true
           schema:
             type: string
       requestBody:
@@ -668,7 +678,7 @@ paths:
         - name: organizationId
           in: query
           description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
-          required: false
+          required: true
           schema:
             type: string
       responses:
@@ -709,7 +719,7 @@ paths:
         - name: organizationId
           in: query
           description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
-          required: false
+          required: true
           schema:
             type: string
       responses:
@@ -757,11 +767,12 @@ paths:
                   description: MIME type of the file
                 organizationId:
                   type: string
-                  description: Organization ID - Optional, uses session's active organization if not provided
+                  description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
               required:
                 - knowledgeId
                 - fileName
                 - contentType
+                - organizationId
       responses:
         '200':
           description: Presigned URL generated successfully
@@ -816,9 +827,10 @@ paths:
                   description: S3 file path
                 organizationId:
                   type: string
-                  description: Organization ID - Optional, uses session's active organization if not provided
+                  description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
               required:
                 - path
+                - organizationId
       responses:
         '200':
           description: File deleted successfully
@@ -856,7 +868,7 @@ paths:
         - name: organizationId
           in: query
           description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
-          required: false
+          required: true
           schema:
             type: string
       responses:
@@ -884,7 +896,7 @@ paths:
         - name: organizationId
           in: query
           description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
-          required: false
+          required: true
           schema:
             type: string
       requestBody:
@@ -942,7 +954,7 @@ paths:
         - name: organizationId
           in: query
           description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
-          required: false
+          required: true
           schema:
             type: string
       requestBody:
@@ -995,7 +1007,7 @@ paths:
         - name: organizationId
           in: query
           description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
-          required: false
+          required: true
           schema:
             type: string
       responses:
