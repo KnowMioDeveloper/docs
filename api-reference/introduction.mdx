@@ -1,33 +1,19 @@
 ---
 title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+description: 'Knowledge Management API with AI capabilities'
 ---
-
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
 
 ## Welcome
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+The KM API provides programmatic access to knowledge management features with AI-powered capabilities. This API enables you to manage documents, sessions, and leverage AI models for intelligent content processing.
 
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+All API endpoints are authenticated using API keys. Include your API key in the request headers:
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+```http
+x-api-key: YOUR_API_KEY
 ```
+
+You can generate and manage your API keys in the [API Keys](/essentials/api_keys) section of your account settings.
