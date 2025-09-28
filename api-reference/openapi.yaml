@@ -18,9 +18,7 @@ paths:
       summary: Check system health
       description: Returns the health status of the API and database connection
       operationId: getHealth
-      security:
-        - apiKey: []
-        - cookieAuth: []
+      security: []
       responses:
         '200':
           description: System is healthy
@@ -63,9 +61,7 @@ paths:
       summary: Sign in with email
       description: Authenticate with email and password
       operationId: signInEmail
-      security:
-        - apiKey: []
-        - cookieAuth: []
+      security: []
       requestBody:
         required: true
         content:
@@ -128,9 +124,7 @@ paths:
       summary: Sign up with email
       description: Create a new account with email and password
       operationId: signUpEmail
-      security:
-        - apiKey: []
-        - cookieAuth: []
+      security: []
       requestBody:
         required: true
         content:
