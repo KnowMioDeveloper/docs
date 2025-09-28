@@ -8,10 +8,12 @@ info:
 servers:
   - url: http://localhost:8000/api
     description: Local development server
-  - url: https://api.example.com/api
+  - url: https://api.dev.knowmio.com/api
+    description: Development server
+  - url: https://api.knowmio.com/api
     description: Production server
 security:
-  - cookieAuth: []
+  - apiKey: []
 paths:
   /health:
     get:
@@ -20,7 +22,9 @@ paths:
       summary: Check system health
       description: Returns the health status of the API and database connection
       operationId: getHealth
-      security: []
+      security:
+        - apiKey: []
+        - cookieAuth: []
       responses:
         '200':
           description: System is healthy
@@ -63,7 +67,9 @@ paths:
       summary: Sign in with email
       description: Authenticate with email and password
       operationId: signInEmail
-      security: []
+      security:
+        - apiKey: []
+        - cookieAuth: []
       requestBody:
         required: true
         content:
@@ -126,7 +132,9 @@ paths:
       summary: Sign up with email
       description: Create a new account with email and password
       operationId: signUpEmail
-      security: []
+      security:
+        - apiKey: []
+        - cookieAuth: []
       requestBody:
         required: true
         content:
@@ -1305,11 +1313,16 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key for authentication (lowercase header name)
     cookieAuth:
       type: apiKey
       in: cookie
       name: better-auth.session_token
-      description: Session cookie from Better Auth. Obtain by calling POST /api/auth/sign-in or POST /api/auth/sign-up
+      description: Session cookie from Better Auth. Obtain by calling POST /api/auth/sign-in/email or POST /api/auth/sign-up/email
   schemas:
     Chat:
       type: object
