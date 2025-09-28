@@ -6,8 +6,12 @@ info:
   contact:
     name: API Support
 servers:
+  - url: http://localhost:8000/api
+    description: Local development server
   - url: https://api.dev.knowmio.com/api
     description: Development server
+  - url: https://api.knowmio.com/api
+    description: Production server
 security:
   - apiKey: []
 paths:
@@ -54,175 +58,6 @@ paths:
                     enum: [disconnected, error]
                   error:
                     type: string
-  /auth/sign-in/email:
-    post:
-      tags:
-        - Auth
-      summary: Sign in with email
-      description: Authenticate with email and password
-      operationId: signInEmail
-      security: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  format: email
-                password:
-                  type: string
-                rememberMe:
-                  type: boolean
-                  description: Keep the session active for longer
-              required:
-                - email
-                - password
-      responses:
-        '200':
-          description: Successfully authenticated
-          headers:
-            Set-Cookie:
-              description: Session cookie
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  token:
-                    type: string
-                    description: Session token
-                  user:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                      email:
-                        type: string
-                      name:
-                        type: string
-                      emailVerified:
-                        type: boolean
-                      createdAt:
-                        type: string
-                        format: date-time
-                      updatedAt:
-                        type: string
-                        format: date-time
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-  /auth/sign-up/email:
-    post:
-      tags:
-        - Auth
-      summary: Sign up with email
-      description: Create a new account with email and password
-      operationId: signUpEmail
-      security: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  format: email
-                password:
-                  type: string
-                name:
-                  type: string
-                image:
-                  type: string
-                  description: Profile image URL
-              required:
-                - email
-                - password
-                - name
-      responses:
-        '200':
-          description: Account created successfully
-          headers:
-            Set-Cookie:
-              description: Session cookie
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  token:
-                    type: string
-                    description: Session token
-                  user:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                      email:
-                        type: string
-                      name:
-                        type: string
-                      emailVerified:
-                        type: boolean
-                      createdAt:
-                        type: string
-                        format: date-time
-                      updatedAt:
-                        type: string
-                        format: date-time
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '409':
-          $ref: '#/components/responses/Conflict'
-  /auth/get-session:
-    get:
-      tags:
-        - Auth
-      summary: Get current session
-      description: Retrieve the current session and user details
-      operationId: getSession
-      responses:
-        '200':
-          description: Session details
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  session:
-                    $ref: '#/components/schemas/Session'
-                  user:
-                    $ref: '#/components/schemas/User'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-  /auth/sign-out:
-    post:
-      tags:
-        - Auth
-      summary: Sign out
-      description: End the current session
-      operationId: signOut
-      responses:
-        '200':
-          description: Successfully signed out
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-        '401':
-          $ref: '#/components/responses/Unauthorized'
   /chat:
     get:
       tags:
@@ -1312,7 +1147,7 @@ components:
       type: apiKey
       in: cookie
       name: better-auth.session_token
-      description: Session cookie from Better Auth. Obtain by calling POST /api/auth/sign-in/email or POST /api/auth/sign-up/email
+      description: Session cookie from Better Auth. See auth documentation at /api/auth/reference
   schemas:
     Chat:
       type: object
@@ -1620,8 +1455,6 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
 tags:
-  - name: Auth
-    description: Authentication endpoints (sign in, sign up, sign out)
   - name: System
     description: System health and status endpoints
   - name: Chat
