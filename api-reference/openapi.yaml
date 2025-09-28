@@ -2,7 +2,16 @@ openapi: 3.0.3
 info:
   title: KM API
   version: 1.0.0
-  description: Knowledge Management API with AI capabilities
+  description: |
+    Knowledge Management API with AI capabilities.
+    
+    ## Organization Context
+    Most endpoints accept an optional `organizationId` parameter. When not provided, the API uses the active organization from your session. You only need to provide `organizationId` when:
+    - Accessing resources from a different organization than your active one
+    - The endpoint explicitly requires it (marked as required)
+    
+    ## Authentication
+    Auth endpoints are managed by Better Auth. See full auth documentation at `/api/auth/reference`
   contact:
     name: API Support
 servers:
@@ -70,7 +79,7 @@ paths:
             type: string
         - name: organizationId
           in: query
-          description: Organization ID (defaults to session's active organization)
+          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
           required: false
           schema:
             type: string
@@ -100,7 +109,7 @@ paths:
       parameters:
         - name: organizationId
           in: query
-          description: Organization ID (defaults to session's active organization)
+          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
           required: false
           schema:
             type: string
@@ -143,7 +152,7 @@ paths:
             type: string
         - name: organizationId
           in: query
-          description: Organization ID (defaults to session's active organization)
+          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
           required: false
           schema:
             type: string
@@ -186,7 +195,7 @@ paths:
             type: string
         - name: organizationId
           in: query
-          description: Organization ID
+          description: Organization ID - Required for this operation
           required: true
           schema:
             type: string
@@ -270,7 +279,7 @@ paths:
                   enum: [openai, anthropic, google, cohere, bedrock]
                 organizationId:
                   type: string
-                  description: Organization ID (optional)
+                  description: Organization ID - Optional, uses session's active organization if not provided
                 knowledgeIds:
                   type: array
                   items:
@@ -358,7 +367,7 @@ paths:
                   description: Text to embed
                 organizationId:
                   type: string
-                  description: Organization ID (optional)
+                  description: Organization ID - Optional, uses session's active organization if not provided
               required:
                 - value
       responses:
@@ -417,7 +426,7 @@ paths:
                   description: Maximum parallel API calls
                 organizationId:
                   type: string
-                  description: Organization ID (optional)
+                  description: Organization ID - Optional, uses session's active organization if not provided
               required:
                 - values
       responses:
@@ -477,7 +486,7 @@ paths:
                   description: Knowledge base IDs to search
                 organizationId:
                   type: string
-                  description: Organization ID (optional)
+                  description: Organization ID - Optional, uses session's active organization if not provided
                 limit:
                   type: integer
                   minimum: 1
@@ -527,7 +536,7 @@ paths:
             type: string
         - name: organizationId
           in: query
-          description: Organization ID (defaults to session's active organization)
+          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
           required: false
           schema:
             type: string
@@ -559,7 +568,7 @@ paths:
       parameters:
         - name: organizationId
           in: query
-          description: Organization ID (defaults to session's active organization)
+          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
           required: false
           schema:
             type: string
@@ -609,7 +618,7 @@ paths:
             type: string
         - name: organizationId
           in: query
-          description: Organization ID (defaults to session's active organization)
+          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
           required: false
           schema:
             type: string
@@ -658,7 +667,7 @@ paths:
             type: string
         - name: organizationId
           in: query
-          description: Organization ID (defaults to session's active organization)
+          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
           required: false
           schema:
             type: string
@@ -699,7 +708,7 @@ paths:
             type: string
         - name: organizationId
           in: query
-          description: Organization ID (defaults to session's active organization)
+          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
           required: false
           schema:
             type: string
@@ -748,7 +757,7 @@ paths:
                   description: MIME type of the file
                 organizationId:
                   type: string
-                  description: Organization ID (optional)
+                  description: Organization ID - Optional, uses session's active organization if not provided
               required:
                 - knowledgeId
                 - fileName
@@ -807,7 +816,7 @@ paths:
                   description: S3 file path
                 organizationId:
                   type: string
-                  description: Organization ID (optional)
+                  description: Organization ID - Optional, uses session's active organization if not provided
               required:
                 - path
       responses:
@@ -846,7 +855,7 @@ paths:
             type: integer
         - name: organizationId
           in: query
-          description: Organization ID (defaults to session's active organization)
+          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
           required: false
           schema:
             type: string
@@ -874,7 +883,7 @@ paths:
       parameters:
         - name: organizationId
           in: query
-          description: Organization ID (defaults to session's active organization)
+          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
           required: false
           schema:
             type: string
@@ -932,7 +941,7 @@ paths:
             type: integer
         - name: organizationId
           in: query
-          description: Organization ID (defaults to session's active organization)
+          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
           required: false
           schema:
             type: string
@@ -985,7 +994,7 @@ paths:
             type: integer
         - name: organizationId
           in: query
-          description: Organization ID (defaults to session's active organization)
+          description: Organization ID - Optional, defaults to session's active organization. Only required if accessing resources from a different organization than your active one.
           required: false
           schema:
             type: string
