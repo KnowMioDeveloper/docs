@@ -593,13 +593,10 @@ paths:
                   type: string
                 description:
                   type: string
-                type:
-                  type: string
                 metadata:
                   type: object
               required:
                 - name
-                - type
       responses:
         '201':
           description: Knowledge base created successfully
@@ -642,8 +639,6 @@ paths:
                 name:
                   type: string
                 description:
-                  type: string
-                type:
                   type: string
                 metadata:
                   type: object
@@ -1227,8 +1222,6 @@ components:
           type: string
         description:
           type: string
-        type:
-          type: string
         metadata:
           type: object
         createdAt:
@@ -1242,7 +1235,6 @@ components:
         - organizationId
         - createdBy
         - name
-        - type
         - createdAt
         - updatedAt
     File:
