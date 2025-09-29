@@ -901,23 +901,28 @@ paths:
             schema:
               type: object
               properties:
-                languageModels:
-                  type: array
-                  items:
-                    type: string
-                embeddingModel:
-                  type: string
-                allowedMimeTypes:
-                  type: array
-                  items:
-                    type: string
-                defaultPrompt:
-                  type: string
+                data:
+                  type: object
+                  properties:
+                    languageModels:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Model'
+                    embeddingModel:
+                      $ref: '#/components/schemas/Model'
+                    mimeTypes:
+                      type: array
+                      items:
+                        type: string
+                    prompt:
+                      type: string
+                  required:
+                    - languageModels
+                    - embeddingModel
+                    - mimeTypes
+                    - prompt
               required:
-                - languageModels
-                - embeddingModel
-                - allowedMimeTypes
-                - defaultPrompt
+                - data
       responses:
         '201':
           description: Configuration created successfully
@@ -959,18 +964,23 @@ paths:
             schema:
               type: object
               properties:
-                languageModels:
-                  type: array
-                  items:
-                    type: string
-                embeddingModel:
-                  type: string
-                allowedMimeTypes:
-                  type: array
-                  items:
-                    type: string
-                defaultPrompt:
-                  type: string
+                data:
+                  type: object
+                  properties:
+                    languageModels:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Model'
+                    embeddingModel:
+                      $ref: '#/components/schemas/Model'
+                    mimeTypes:
+                      type: array
+                      items:
+                        type: string
+                    prompt:
+                      type: string
+              required:
+                - data
       responses:
         '200':
           description: Configuration updated successfully
@@ -1276,18 +1286,21 @@ components:
           type: integer
         organizationId:
           type: string
-        languageModels:
-          type: array
-          items:
-            type: string
-        embeddingModel:
-          type: string
-        allowedMimeTypes:
-          type: array
-          items:
-            type: string
-        defaultPrompt:
-          type: string
+        data:
+          type: object
+          properties:
+            languageModels:
+              type: array
+              items:
+                $ref: '#/components/schemas/Model'
+            embeddingModel:
+              $ref: '#/components/schemas/Model'
+            mimeTypes:
+              type: array
+              items:
+                type: string
+            prompt:
+              type: string
         createdAt:
           type: string
           format: date-time
@@ -1297,10 +1310,7 @@ components:
       required:
         - id
         - organizationId
-        - languageModels
-        - embeddingModel
-        - allowedMimeTypes
-        - defaultPrompt
+        - data
         - createdAt
         - updatedAt
     Model:
