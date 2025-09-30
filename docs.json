@@ -72,12 +72,7 @@
         "label": "Support",
         "href": "mailto:support@knowmio.com"
       }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "WebApp",
-      "href": "https://app.knowmio.com"
-    }
+    ]
   },
   "contextual": {
     "options": [
