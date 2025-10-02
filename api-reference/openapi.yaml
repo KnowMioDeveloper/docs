@@ -1066,12 +1066,12 @@ paths:
       tags:
         - Models
       summary: Get AI models
-      description: Retrieve available AI models
+      description: Retrieve all available AI models or a specific model by slug
       operationId: getModels
       parameters:
         - name: slug
           in: query
-          description: Specific model slug
+          description: Optional model slug to retrieve a specific model
           required: false
           schema:
             type: string
@@ -1086,6 +1086,8 @@ paths:
                   - type: array
                     items:
                       $ref: '#/components/schemas/Model'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -1094,7 +1096,7 @@ paths:
       tags:
         - Models
       summary: Create AI model
-      description: Add a new AI model
+      description: Add a new AI model to the system
       operationId: createModel
       requestBody:
         required: true
@@ -1105,13 +1107,17 @@ paths:
               properties:
                 slug:
                   type: string
+                  description: Unique identifier for the model
                 name:
                   type: string
+                  description: Display name of the model
                 provider:
                   type: string
                   enum: [openai, anthropic, google, cohere, bedrock]
+                  description: AI provider
                 metadata:
                   type: object
+                  description: Additional model metadata
               required:
                 - slug
                 - name
@@ -1123,6 +1129,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Model'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '409':
           $ref: '#/components/responses/Conflict'
         '500':
@@ -1149,11 +1157,27 @@ paths:
               properties:
                 name:
                   type: string
+                  description: Display name of the model
                 provider:
                   type: string
                   enum: [openai, anthropic, google, cohere, bedrock]
+                  description: AI provider
                 metadata:
                   type: object
+                  description: Additional model metadata
+                pricing:
+                  type: object
+                  description: Pricing information for the model
+                  properties:
+                    prompt:
+                      type: number
+                      description: Cost per prompt token
+                    completion:
+                      type: number
+                      description: Cost per completion token
+                  required:
+                    - prompt
+                    - completion
       responses:
         '200':
           description: Model updated successfully
@@ -1161,6 +1185,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Model'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -1169,7 +1195,7 @@ paths:
       tags:
         - Models
       summary: Delete AI model
-      description: Delete an AI model
+      description: Delete an AI model from the system
       operationId: deleteModel
       parameters:
         - name: slug
@@ -1185,6 +1211,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Model'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
