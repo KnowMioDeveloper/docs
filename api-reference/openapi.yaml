@@ -1118,10 +1118,24 @@ paths:
                 metadata:
                   type: object
                   description: Additional model metadata
+                pricing:
+                  type: object
+                  description: Pricing information for the model
+                  properties:
+                    prompt:
+                      type: number
+                      description: Cost per prompt token
+                    completion:
+                      type: number
+                      description: Cost per completion token
+                  required:
+                    - prompt
+                    - completion
               required:
                 - slug
                 - name
                 - provider
+                - pricing
       responses:
         '201':
           description: Model created successfully
