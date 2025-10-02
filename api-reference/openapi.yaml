@@ -1420,13 +1420,43 @@ components:
       properties:
         slug:
           type: string
+          description: Unique identifier for the model
         name:
           type: string
+          description: Display name of the model
+        type:
+          type: string
+          enum: [language, embedding]
+          description: Type of model
         provider:
           type: string
           enum: [openai, anthropic, google, cohere, bedrock]
-        metadata:
+          description: AI provider
+        inputModalities:
+          type: array
+          items:
+            type: string
+            enum: [text, image, file, audio, video]
+          description: Supported input modalities
+        outputModalities:
+          type: array
+          items:
+            type: string
+            enum: [text, image, file, audio, video]
+          description: Supported output modalities
+        pricing:
           type: object
+          description: Pricing information for the model
+          properties:
+            prompt:
+              type: number
+              description: Cost per prompt token
+            completion:
+              type: number
+              description: Cost per completion token
+          required:
+            - prompt
+            - completion
         createdAt:
           type: string
           format: date-time
@@ -1436,7 +1466,11 @@ components:
       required:
         - slug
         - name
+        - type
         - provider
+        - inputModalities
+        - outputModalities
+        - pricing
         - createdAt
         - updatedAt
     Session:
