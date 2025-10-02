@@ -306,7 +306,7 @@ paths:
                       - parts
                 model:
                   type: string
-                  description: Model name (e.g., gpt-4.1)
+                  description: Model slug (e.g., gpt-4.1)
                 provider:
                   type: string
                   enum: [openai, anthropic, google, cohere, bedrock]
@@ -361,7 +361,7 @@ paths:
               properties:
                 model:
                   type: string
-                  description: Model name (ignored, always uses Claude Opus 4.1)
+                  description: Model slug (ignored, always uses Claude Opus 4.1)
                 messages:
                   type: array
                   items:
