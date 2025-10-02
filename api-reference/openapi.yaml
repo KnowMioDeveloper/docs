@@ -1111,13 +1111,26 @@ paths:
                 name:
                   type: string
                   description: Display name of the model
+                type:
+                  type: string
+                  enum: [language, embedding]
+                  description: Type of model
                 provider:
                   type: string
                   enum: [openai, anthropic, google, cohere, bedrock]
                   description: AI provider
-                metadata:
-                  type: object
-                  description: Additional model metadata
+                inputModalities:
+                  type: array
+                  items:
+                    type: string
+                    enum: [text, image, file, audio, video]
+                  description: Supported input modalities
+                outputModalities:
+                  type: array
+                  items:
+                    type: string
+                    enum: [text, image, file, audio, video]
+                  description: Supported output modalities
                 pricing:
                   type: object
                   description: Pricing information for the model
@@ -1134,7 +1147,10 @@ paths:
               required:
                 - slug
                 - name
+                - type
                 - provider
+                - inputModalities
+                - outputModalities
                 - pricing
       responses:
         '201':
@@ -1172,13 +1188,26 @@ paths:
                 name:
                   type: string
                   description: Display name of the model
+                type:
+                  type: string
+                  enum: [language, embedding]
+                  description: Type of model
                 provider:
                   type: string
                   enum: [openai, anthropic, google, cohere, bedrock]
                   description: AI provider
-                metadata:
-                  type: object
-                  description: Additional model metadata
+                inputModalities:
+                  type: array
+                  items:
+                    type: string
+                    enum: [text, image, file, audio, video]
+                  description: Supported input modalities
+                outputModalities:
+                  type: array
+                  items:
+                    type: string
+                    enum: [text, image, file, audio, video]
+                  description: Supported output modalities
                 pricing:
                   type: object
                   description: Pricing information for the model
