@@ -277,15 +277,45 @@ paths:
                   description: Conversation messages
                   items:
                     type: object
+                    properties:
+                      id:
+                        type: string
+                        description: Message ID
+                      role:
+                        type: string
+                        enum: [user, assistant, system]
+                        description: Message role
+                      parts:
+                        type: array
+                        description: Message parts
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              enum: [text, image]
+                              description: Part type
+                            text:
+                              type: string
+                              description: Text content (for text parts)
+                          required:
+                            - type
+                    required:
+                      - id
+                      - role
+                      - parts
                 model:
                   type: string
-                  description: Model name
+                  description: Model name (e.g., gpt-4.1)
                 provider:
                   type: string
                   enum: [openai, anthropic, google, cohere, bedrock]
                 organizationId:
                   type: string
                   description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
+                trigger:
+                  type: string
+                  description: Trigger type (e.g., submit-message)
                 knowledgeIds:
                   type: array
                   items:
@@ -298,6 +328,7 @@ paths:
                 - model
                 - provider
                 - organizationId
+                - trigger
       responses:
         '200':
           description: Server-Sent Events stream
