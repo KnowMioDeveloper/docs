@@ -45,6 +45,12 @@
               "org_management/teams",
               "org_management/delete"
             ]
+          },
+          {
+            "group": "Developer Use",
+            "pages": [
+              "developer_use/continue"
+            ]
           }
         ]
       },

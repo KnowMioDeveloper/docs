@@ -1,0 +1,92 @@
+# Setting Up Knowmio Agent for Continue.dev
+
+This guide walks you through setting up Knowmio as a custom model in Continue.dev.
+
+## Prerequisites
+
+- Continue.dev extension installed (VS Code or Cursor)
+- Knowmio API key (obtain from your Knowmio account)
+
+## Step 1: Create the Agent Configuration
+
+1. Navigate to your Continue configuration directory:
+   - macOS/Linux: `~/.continue/`
+   - Windows: `%USERPROFILE%\.continue\`
+
+2. Create or edit `config.yaml`
+
+3. Add the following configuration:
+
+```yaml
+name: KnowMio
+version: 1.0.0
+schema: v1
+
+models:
+  - name: Knowmio
+    provider: openai
+    model: knowmio-chat
+    apiBase: https://api.dev.knowmio.com/api/openai
+    requestOptions:
+      headers:
+        x-api-key: ${{ secrets.KNOWMIO_API_KEY }}
+    roles:
+      - chat
+      - edit
+    capabilities:
+      - tool_use
+```
+
+## Step 2: Add Your API Key to Continue Hub Secrets
+
+1. Open Continue settings in your IDE
+2. Navigate to "Secrets" or "Continue Hub"
+3. Add a new secret:
+   - **Name**: `KNOWMIO_API_KEY`
+   - **Value**: Your Knowmio API key
+
+Alternatively, you can temporarily hardcode the API key for testing:
+
+```yaml
+requestOptions:
+  headers:
+    x-api-key: your-actual-api-key-here
+```
+
+## Step 3: Restart Continue
+
+Restart the Continue extension or reload your IDE to apply the configuration.
+
+## Step 4: Test the Integration
+
+1. Open Continue chat
+2. Select "Knowmio" from the model dropdown
+3. Send a test message: "Hi, how are you?"
+
+## Authentication Details
+
+Knowmio uses Better Auth's API key plugin with the `x-api-key` header for authentication. The configuration uses `requestOptions.headers` to send the API key in the correct format that Knowmio's backend expects.
+
+## Troubleshooting
+
+### 401 Unauthorized Error
+- Verify your API key is correct
+- Ensure the secret name matches exactly: `KNOWMIO_API_KEY`
+- Check that the API key has the correct permissions
+
+### Configuration Parse Errors
+- Verify YAML indentation (use 2 spaces, not tabs)
+- Ensure no extra fields at the top level (name, version, schema should only be present for agent definitions)
+
+### Model Not Appearing
+- Restart Continue/IDE
+- Check the Continue logs for errors
+- Verify the `apiBase` URL is correct
+
+## API Endpoint
+
+The Knowmio OpenAI-compatible endpoint is located at:
+- **Development**: `https://api.dev.knowmio.com/api/openai`
+- **Production**: Update the `apiBase` URL accordingly
+
+The endpoint implements the OpenAI Chat Completions API format and internally uses Claude Opus 4.1 via AWS Bedrock.
