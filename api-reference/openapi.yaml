@@ -882,12 +882,12 @@ paths:
       tags:
         - Config
       summary: Get configuration
-      description: Retrieve organization configuration
+      description: Retrieve organization configuration by organization ID or specific config by ID
       operationId: getConfig
       parameters:
         - name: id
           in: query
-          description: Specific config ID
+          description: Optional specific config ID
           required: false
           schema:
             type: integer
@@ -906,6 +906,8 @@ paths:
                 $ref: '#/components/schemas/Config'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
@@ -916,7 +918,7 @@ paths:
       tags:
         - Config
       summary: Create configuration
-      description: Create organization configuration
+      description: Create a new organization configuration
       operationId: createConfig
       parameters:
         - name: organizationId
@@ -932,28 +934,27 @@ paths:
             schema:
               type: object
               properties:
-                data:
-                  type: object
-                  properties:
-                    languageModels:
-                      type: array
-                      items:
-                        $ref: '#/components/schemas/Model'
-                    embeddingModel:
-                      $ref: '#/components/schemas/Model'
-                    mimeTypes:
-                      type: array
-                      items:
-                        type: string
-                    prompt:
-                      type: string
-                  required:
-                    - languageModels
-                    - embeddingModel
-                    - mimeTypes
-                    - prompt
+                languageModelSlugs:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of language model slugs
+                  default: []
+                embeddingModelSlug:
+                  type: string
+                  description: Embedding model slug
+                mimeTypes:
+                  type: array
+                  items:
+                    type: string
+                  description: Supported MIME types
+                  default: []
+                prompt:
+                  type: string
+                  description: System prompt configuration
+                  default: ""
               required:
-                - data
+                - embeddingModelSlug
       responses:
         '201':
           description: Configuration created successfully
@@ -963,6 +964,8 @@ paths:
                 $ref: '#/components/schemas/Config'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '409':
@@ -973,7 +976,7 @@ paths:
       tags:
         - Config
       summary: Update configuration
-      description: Update organization configuration
+      description: Update an existing organization configuration
       operationId: updateConfig
       parameters:
         - name: id
@@ -995,23 +998,22 @@ paths:
             schema:
               type: object
               properties:
-                data:
-                  type: object
-                  properties:
-                    languageModels:
-                      type: array
-                      items:
-                        $ref: '#/components/schemas/Model'
-                    embeddingModel:
-                      $ref: '#/components/schemas/Model'
-                    mimeTypes:
-                      type: array
-                      items:
-                        type: string
-                    prompt:
-                      type: string
-              required:
-                - data
+                languageModelSlugs:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of language model slugs
+                embeddingModelSlug:
+                  type: string
+                  description: Embedding model slug
+                mimeTypes:
+                  type: array
+                  items:
+                    type: string
+                  description: Supported MIME types
+                prompt:
+                  type: string
+                  description: System prompt configuration
       responses:
         '200':
           description: Configuration updated successfully
@@ -1021,6 +1023,8 @@ paths:
                 $ref: '#/components/schemas/Config'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
@@ -1031,7 +1035,7 @@ paths:
       tags:
         - Config
       summary: Delete configuration
-      description: Delete organization configuration
+      description: Delete an organization configuration
       operationId: deleteConfig
       parameters:
         - name: id
@@ -1055,6 +1059,8 @@ paths:
                 $ref: '#/components/schemas/Config'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
@@ -1386,23 +1392,26 @@ components:
       properties:
         id:
           type: integer
+          description: Unique config ID
         organizationId:
           type: string
-        data:
-          type: object
-          properties:
-            languageModels:
-              type: array
-              items:
-                $ref: '#/components/schemas/Model'
-            embeddingModel:
-              $ref: '#/components/schemas/Model'
-            mimeTypes:
-              type: array
-              items:
-                type: string
-            prompt:
-              type: string
+          description: Organization this config belongs to
+        languageModelSlugs:
+          type: array
+          items:
+            type: string
+          description: Array of language model slugs
+        embeddingModelSlug:
+          type: string
+          description: Embedding model slug
+        mimeTypes:
+          type: array
+          items:
+            type: string
+          description: Supported MIME types
+        prompt:
+          type: string
+          description: System prompt configuration
         createdAt:
           type: string
           format: date-time
@@ -1412,7 +1421,10 @@ components:
       required:
         - id
         - organizationId
-        - data
+        - languageModelSlugs
+        - embeddingModelSlug
+        - mimeTypes
+        - prompt
         - createdAt
         - updatedAt
     Model:
