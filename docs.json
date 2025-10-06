@@ -49,7 +49,8 @@
           {
             "group": "Developer Use",
             "pages": [
-              "developer_use/continue"
+              "developer_use/continue",
+              "developer_use/python_openai_sdk"
             ]
           }
         ]

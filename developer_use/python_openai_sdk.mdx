@@ -1,0 +1,129 @@
+---
+title: Python OpenAI SDK
+description: Use the OpenAI Python SDK to interact with Knowmio's AI models
+---
+
+# Using the Python OpenAI SDK with Knowmio
+
+You can use the official OpenAI Python SDK to interact with Knowmio's AI models through our OpenAI-compatible API endpoint.
+
+## Prerequisites
+
+- Python 3.7 or higher
+- Knowmio API key (obtain from your Knowmio account)
+
+## Installation
+
+Install the OpenAI Python SDK:
+
+```bash
+pip install openai
+```
+
+## Basic Usage
+
+Configure the SDK to point to Knowmio's API endpoint:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.dev.knowmio.com/api/openai",
+    default_headers={
+        "x-api-key": "your-api-key-here"
+    }
+)
+
+response = client.chat.completions.create(
+    model="claude-opus-4.1",  # Model selection is handled by your Knowmio configuration
+    messages=[
+        {
+            "role": "user",
+            "content": "Hello, how are you?",
+        },
+    ],
+)
+
+print(response.choices[0].message.content)
+```
+
+## Streaming Responses
+
+For real-time streaming responses:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.dev.knowmio.com/api/openai",
+    default_headers={
+        "x-api-key": "your-api-key-here"
+    }
+)
+
+stream = client.chat.completions.create(
+    model="claude-opus-4.1",
+    messages=[
+        {
+            "role": "user",
+            "content": "Say 'double bubble bath' three times fast.",
+        },
+    ],
+    stream=True,
+)
+
+for chunk in stream:
+    print(chunk.choices[0].delta.content, end="")
+```
+
+## Authentication
+
+Knowmio uses API key authentication via the `x-api-key` header. Pass your API key in the `default_headers` parameter when initializing the client.
+
+### Environment Variables
+
+For better security, store your API key in an environment variable:
+
+```python
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.dev.knowmio.com/api/openai",
+    default_headers={
+        "x-api-key": os.environ.get("KNOWMIO_API_KEY")
+    }
+)
+```
+
+## Available Models
+
+Specify the model in the `model` parameter:
+
+- `claude-opus-4.1` - Most capable model for complex tasks
+- Other models as configured in your Knowmio organization
+
+## API Endpoint
+
+The Knowmio OpenAI-compatible endpoint:
+- **Development**: `https://api.dev.knowmio.com/api/openai`
+- **Production**: Update the `base_url` accordingly
+
+The endpoint implements the OpenAI Chat Completions API format.
+
+## Troubleshooting
+
+### 401 Unauthorized Error
+- Verify your API key is correct
+- Ensure you're using the `x-api-key` header (not `Authorization`)
+- Check that the API key has the correct permissions
+
+### Connection Errors
+- Verify the `base_url` is correct
+- Check your network connection
+- Ensure you're not behind a proxy that blocks the connection
+
+### Model Not Found
+- Verify the model name is correct
+- Check that the model is available in your Knowmio organization
+- Ensure your API key has access to the specified model
