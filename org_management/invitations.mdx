@@ -19,11 +19,14 @@ The top section of the page allows you to invite new members to join your organi
 
 To send an invitation:
 
-1. Select the **Member** role for the new member
-2. Enter the recipient's email address
-3. Click **Send** to deliver the invitation
+1. Enter the recipient's email address
+2. Select a role from the dropdown:
+   - **Member** - Standard access
+   - **Admin** - Administrative access
+   - **Owner** - Full ownership rights (only visible if you're an owner)
+3. Click **Send** to create the invitation
 
-The invited user will receive an email with instructions to join your organization.
+After sending, you'll see a success dialog with a unique invitation link that you can copy and share. The link expires in 48 hours.
 
 ## Managing Invitations
 
@@ -31,11 +34,23 @@ The bottom section displays all organization invitations and their status.
 
 ### Invitations List
 
-When invitations have been sent, you'll see a list showing:
+The invitations table displays all invitations regardless of status, showing:
 
-- Invited email addresses
-- Invitation status (pending, accepted, expired)
-- Date sent
-- Available actions (resend, cancel)
+- **Email address** - The recipient's email
+- **Role** - The assigned role (member, admin, or owner)
+- **Status** - Current state of the invitation:
+  - `pending` - Awaiting acceptance
+  - `accepted` - User has joined
+  - `expired` - Past expiration date
+- **Expiration date** - When the invitation expires (48 hours from creation)
+- **Badge counter** - Total number of invitations
 
-When no invitations have been sent yet, you'll see "No invitations sent".
+### Available Actions
+
+For pending invitations, you can:
+
+- **Copy link** - Copy the invitation URL to your clipboard
+- **Resend** - Send another invitation email to the same recipient
+- **Cancel** - Revoke the invitation (requires confirmation)
+
+When no invitations exist, you'll see "No invitations sent".
