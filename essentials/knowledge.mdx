@@ -1,0 +1,94 @@
+---
+title: Knowledge Base
+description: Create and manage knowledge items for your organization
+---
+
+## Overview
+
+The Knowledge Base allows you to store and organize information that can be accessed by your organization members. Knowledge items can be personal (visible only to you) or shared with specific teams.
+
+## Access Control
+
+Knowledge visibility is determined by:
+
+- **Personal knowledge** - Items you create without assigning to a team (visible only to you)
+- **Team knowledge** - Items assigned to a team (visible to all team members)
+
+You can only view, edit, and delete knowledge items that:
+- You created (personal knowledge)
+- Belong to teams you're a member of (team knowledge)
+
+## Creating Knowledge Items
+
+To create a new knowledge item:
+
+1. Navigate to the Knowledge Base section
+2. Click **Create** or **Add Knowledge**
+3. Fill in the required information:
+   - **Title** - Name of the knowledge item
+   - **Content** - The actual information or documentation
+   - **Team** (optional) - Select a team to share with, or leave empty for personal knowledge
+4. Click **Save** to create the item
+
+**Requirements:**
+- You must be a member of the organization
+- If assigning to a team, you must be a member of that team
+- The team must belong to your current organization
+
+## Viewing Knowledge Items
+
+The Knowledge Base displays all items you have access to:
+
+- Your personal knowledge items (not assigned to any team)
+- Knowledge items from teams you're a member of
+
+You can:
+- View individual items by clicking on them
+- Filter by team or personal items
+- Search through available knowledge
+
+## Editing Knowledge Items
+
+You can only edit knowledge items you created.
+
+To edit:
+
+1. Open the knowledge item
+2. Click **Edit**
+3. Modify the content or settings
+4. Click **Save** to apply changes
+
+**Permissions:**
+- Only the creator can edit a knowledge item
+- You can change the team assignment if you're a member of the new team
+- Setting team to empty converts it to personal knowledge
+
+## Deleting Knowledge Items
+
+You can only delete knowledge items you created.
+
+To delete:
+
+1. Open the knowledge item
+2. Click **Delete**
+3. Confirm the deletion
+
+**Note:** Deletion is permanent and cannot be undone.
+
+## Team Assignment
+
+When creating or editing knowledge:
+
+- **No team selected** - Creates personal knowledge visible only to you
+- **Team selected** - Creates team knowledge visible to all team members
+- **Changing teams** - You must be a member of both the current and new team
+- **Removing team** - Converts team knowledge to personal knowledge
+
+## Organization Context
+
+All knowledge operations require an active organization context. The organization ID is determined by:
+
+1. Your current active organization (from session)
+2. Explicit organization ID in the request (if provided)
+
+You must be a member of the organization to access its knowledge base.
