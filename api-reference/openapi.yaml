@@ -566,7 +566,12 @@ paths:
       tags:
         - Knowledge
       summary: Get knowledge items
-      description: Retrieve knowledge bases
+      description: |-
+        Retrieve knowledge bases accessible to the authenticated user.
+
+        **Access Control**:
+        - Returns personal knowledge (no team, created by user) and team knowledge (user is a team member)
+        - Filters by organization membership
       operationId: getKnowledge
       parameters:
         - name: id
@@ -575,10 +580,11 @@ paths:
           required: false
           schema:
             type: string
+            format: uuid
         - name: organizationId
           in: query
           description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
-          required: true
+          required: false
           schema:
             type: string
       responses:
@@ -594,6 +600,8 @@ paths:
                       $ref: '#/components/schemas/Knowledge'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
@@ -604,13 +612,19 @@ paths:
       tags:
         - Knowledge
       summary: Create knowledge base
-      description: Create a new knowledge base
+      description: |-
+        Create a new knowledge base.
+
+        **Access Control**:
+        - Must be a member of the organization
+        - If teamId is provided, must be a member of that team
+        - Team must belong to the organization
       operationId: createKnowledge
       parameters:
         - name: organizationId
           in: query
           description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
-          required: true
+          required: false
           schema:
             type: string
       requestBody:
@@ -622,10 +636,15 @@ paths:
               properties:
                 name:
                   type: string
+                  description: Name of the knowledge base
                 description:
                   type: string
-                metadata:
-                  type: object
+                  description: Description of the knowledge base
+                  nullable: true
+                teamId:
+                  type: string
+                  description: Optional team ID to associate this knowledge base with a team
+                  nullable: true
               required:
                 - name
       responses:
@@ -637,6 +656,8 @@ paths:
                 $ref: '#/components/schemas/Knowledge'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '500':
@@ -645,7 +666,13 @@ paths:
       tags:
         - Knowledge
       summary: Update knowledge base
-      description: Update an existing knowledge base
+      description: |-
+        Update an existing knowledge base.
+
+        **Access Control**:
+        - Only the creator can edit the knowledge base
+        - Must have access to the knowledge base (personal or team member)
+        - If changing teamId, must be a member of the new team
       operationId: updateKnowledge
       parameters:
         - name: id
@@ -654,10 +681,11 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
         - name: organizationId
           in: query
           description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
-          required: true
+          required: false
           schema:
             type: string
       requestBody:
@@ -669,10 +697,15 @@ paths:
               properties:
                 name:
                   type: string
+                  description: Name of the knowledge base
                 description:
                   type: string
-                metadata:
-                  type: object
+                  description: Description of the knowledge base
+                  nullable: true
+                teamId:
+                  type: string
+                  description: Team ID to associate this knowledge base with (null for personal knowledge)
+                  nullable: true
       responses:
         '200':
           description: Knowledge base updated successfully
@@ -682,6 +715,8 @@ paths:
                 $ref: '#/components/schemas/Knowledge'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
@@ -692,7 +727,12 @@ paths:
       tags:
         - Knowledge
       summary: Delete knowledge base
-      description: Delete a knowledge base
+      description: |-
+        Delete a knowledge base.
+
+        **Access Control**:
+        - Only the creator can delete the knowledge base
+        - Must have access to the knowledge base (personal or team member)
       operationId: deleteKnowledge
       parameters:
         - name: id
@@ -701,10 +741,11 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
         - name: organizationId
           in: query
           description: Organization ID - Required when using API Key authentication. Optional with session authentication (defaults to session's active organization).
-          required: true
+          required: false
           schema:
             type: string
       responses:
@@ -716,6 +757,8 @@ paths:
                 $ref: '#/components/schemas/Knowledge'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
@@ -1332,6 +1375,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         organizationId:
           type: string
         createdBy:
@@ -1340,8 +1384,11 @@ components:
           type: string
         description:
           type: string
-        metadata:
-          type: object
+          nullable: true
+        teamId:
+          type: string
+          nullable: true
+          description: Team ID if this is team knowledge, null for personal knowledge
         createdAt:
           type: string
           format: date-time
